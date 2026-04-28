@@ -55,3 +55,47 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.action} - {self.target}"
+
+
+class Notification(models.Model):
+    TYPE_CHOICES = [
+        ('transaction', 'Transaction'),
+        ('payment', 'Payment'),
+        ('inventory', 'Inventory'),
+        ('system', 'System'),
+        ('user', 'User'),
+    ]
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    business = models.ForeignKey(
+        Business, on_delete=models.CASCADE, related_name='notifications'
+    )
+    # Optional: target a specific user; if None, visible to all business users
+    recipient = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True,
+        related_name='notifications'
+    )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='system')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    # Optional deep-link data (e.g. {"module": "transactions", "id": "uuid"})
+    data = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['business', 'is_read']),
+            models.Index(fields=['business', 'created_at']),
+            models.Index(fields=['recipient', 'is_read']),
+        ]
+
+    def __str__(self):
+        return f"[{self.type}] {self.title}"

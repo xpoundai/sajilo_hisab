@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Business, PlatformUser, ActivityLog
+from .models import Business, PlatformUser, ActivityLog, Notification
 
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
@@ -15,3 +15,10 @@ class PlatformUserAdmin(admin.ModelAdmin):
 class ActivityLogAdmin(admin.ModelAdmin):
     list_display = ['action', 'target', 'module', 'user_name', 'timestamp']
     list_filter = ['module']
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['title', 'type', 'priority', 'business', 'is_read', 'created_at']
+    list_filter = ['type', 'priority', 'is_read']
+    search_fields = ['title', 'message']
+    readonly_fields = ['id', 'created_at']

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/data_provider.dart';
+import '../providers/notification_provider.dart';
 import '../core/theme.dart';
 import '../core/formatters.dart';
 import '../widgets/common.dart';
@@ -22,6 +23,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DataProvider>().loadDashboard();
+      context.read<NotificationProvider>().refreshUnreadCount();
     });
   }
 
@@ -56,19 +58,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         actions: [
-          Stack(
-            children: [
-              IconButton(icon: const Icon(Icons.notifications_outlined), onPressed: () {}),
-              Positioned(
-                right: 10,
-                top: 10,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(color: AppTheme.accentGreen, shape: BoxShape.circle),
-                ),
-              ),
-            ],
+          Consumer<NotificationProvider>(
+            builder: (context, notifProvider, _) {
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () => context.push('/notifications'),
+                  ),
+                  if (notifProvider.unreadCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                        decoration: const BoxDecoration(
+                          color: AppTheme.errorRed,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          notifProvider.unreadCount > 99
+                              ? '99+'
+                              : '${notifProvider.unreadCount}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),

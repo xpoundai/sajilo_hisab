@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'providers/auth_provider.dart';
 import 'providers/data_provider.dart';
+import 'providers/notification_provider.dart';
 import 'core/theme.dart';
 import 'core/constants.dart';
 import 'screens/splash_screen.dart';
@@ -15,6 +16,7 @@ import 'screens/payment_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/users_screen.dart';
 import 'screens/super_admin_screen.dart';
+import 'screens/notifications_screen.dart';
 
 void main() {
   runApp(
@@ -22,6 +24,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => DataProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const SajiloHisabApp(),
     ),
@@ -174,5 +177,6 @@ final _router = GoRouter(
     GoRoute(path: '/reports/receivable', builder: (_, __) => const ReportDetailScreen(title: 'Receivable', endpoint: ApiConstants.reportReceivable)),
     GoRoute(path: '/reports/payable', builder: (_, __) => const ReportDetailScreen(title: 'Payable', endpoint: ApiConstants.reportPayable)),
     GoRoute(path: '/reports/cashflow', builder: (_, __) => const ReportDetailScreen(title: 'Cash Flow', endpoint: ApiConstants.reportCashflow)),
+    GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
   ],
 );

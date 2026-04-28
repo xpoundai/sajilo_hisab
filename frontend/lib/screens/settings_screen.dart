@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/data_provider.dart';
+import '../providers/notification_provider.dart';
 import '../core/theme.dart';
 import '../core/formatters.dart';
 import '../widgets/common.dart';
@@ -67,6 +68,37 @@ class SettingsScreen extends StatelessWidget {
             _settingsItem(context, Icons.people_outline, 'Manage Users', () => context.push('/users')),
           const SizedBox(height: 20),
 
+          // Notifications
+          const Text('Notifications', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+          const SizedBox(height: 8),
+          Consumer<NotificationProvider>(
+            builder: (context, notifProvider, _) {
+              return _settingsItem(
+                context,
+                Icons.notifications_outlined,
+                'Notifications',
+                () => context.push('/notifications'),
+                trailing: notifProvider.unreadCount > 0
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.errorRed,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${notifProvider.unreadCount}',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      )
+                    : null,
+              );
+            },
+          ),
+          const SizedBox(height: 20),
+
           // App Settings
           const Text('App Settings', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
           const SizedBox(height: 8),
@@ -109,7 +141,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _settingsItem(BuildContext context, IconData icon, String label, VoidCallback onTap, {String? trailing}) {
+  Widget _settingsItem(BuildContext context, IconData icon, String label, VoidCallback onTap, {dynamic trailing}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: AppTheme.cardShadow),
@@ -117,7 +149,9 @@ class SettingsScreen extends StatelessWidget {
         leading: Icon(icon, color: AppTheme.primaryBlue, size: 22),
         title: Text(label, style: const TextStyle(fontSize: 15)),
         trailing: trailing != null
-            ? Text(trailing, style: const TextStyle(color: AppTheme.textSecondary))
+            ? (trailing is Widget
+                ? trailing
+                : Text(trailing.toString(), style: const TextStyle(color: AppTheme.textSecondary)))
             : const Icon(Icons.chevron_right, color: AppTheme.textLight),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onTap: onTap,
